@@ -1,0 +1,66 @@
+---
+title: "HW 3"
+author: "Jaydon Cobb, github: JaydonLCobb"
+--- 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Tips at Restaurants
+In this homework we will use the `tips` data set. This data set is part of the `reshape2` package. You can load the data set by executing the command:
+```{r}
+data(tips, package="reshape2")
+```
+1.  How many parties did the waiter serve? Store the number in `numParty` and print. 
+```{r}
+numParty <- nrow(tips)
+numParty
+```
+## 244 tables were served
+2. What are the types of variables in the data frame `tips`? Include the code and also explain verbally.
+```{r}
+str(tips)
+```
+## In the given data we have 7 variables. 3 involve numeric/int values and 4 involving factorials.
+3. Create a vector named `day` containing the day of visits in `tips`. The factor levels should be ordered from Thursday to Sunday. Print the variable.
+```{r}
+day <- tips$day
+day <- factor(day, levels = c("Thur", "Fri", "Sat", "Sun"))
+day
+```
+4. Create a data frame named `female5` containing the meal paid by a female payer in a party with size greater than or euqal to 5. Print the data frame.
+```{r}
+femalefive <- tips[tips$size >=5 & tips$sex == "Female",]
+femalefive
+```
+5. How does the tipping amount (`tip`) depend on the overall bill (`total_bill`)? Use the `ggplot2` package to make a chart. Describe the relationship in words.  
+```{r}
+library(ggplot2)
+ggplot(tips, aes(x=total_bill, y=tip)) + geom_point() + stat_smooth(method=lm) + labs(title="Relationship Between Tips and Total Bill Price", x = "Total Bill Price (in Dollars)", y = "Tip Amount (in Dollars)") + theme(plot.title = element_text(hjust = 0.5))
+```
+## There is a gradual and positive correlation total bill + tips given
+6. Describe at least two types of anomalies in the previous plot. What do they mean?
+## Low bill high tip is one (ex. $10 tip on $50) and then the opposite, high bill low tip.
+7. Introduce a variable `tiprate` into the data set which stands for the rate of tips. What is the average rate for tips? Explain verbally. 
+```{r}
+tips$tiprate <- (tips$tip / tips$total_bill);
+mean(tips$tiprate)
+```
+## Average tiprate of 16% or amount people spend on their bill in consideration to tip.
+8. Make a boxplot of the tip rate by time. The x-axis should be ordered by lunch and then dinner. Use `ggplot2` to make a chart. Verbally explain the chart.
+```{r}
+levelprime <- rev(levels(tips$time))
+timeprime <- factor(tips$time, levels =levelprime)
+ggplot(tips, aes(x=timeprime, y=tiprate))+ geom_boxplot()
+```
+## The means are relatively close to each other, we see a higher amount of outlier tiprates when looking at dinner. With that being said the mean (50%) of tippers at lunch tip above the mean (50%) of those at dinner.
+9. How does smoking behavior and gender of the person who pays impact the relationship between tip and total bill? Find a visualization that incorporates all four variables. Interpret the result.
+```{r}
+ggplot(tips, aes(x=total_bill, y=tip)) + geom_point() +facet_grid(sex ~ smoker) + ylab("Tip") + stat_smooth(method=lm)
+```
+## Non-smokers appear to be more consistent in their tipping trends and it also appears that the smoking group tips lower more often.
+10. Use ggplot2 to find a graphical summary of the relationship between day of the week and gender of the person paying the bill. What can you say about this relationship?
+```{r}
+ggplot(tips, aes(x=day, fill=sex)) + geom_bar(position="fill")
+```
+## The weekends show that men are more likely to pay the bill Friday through Sunday, and the rest of the days don't have a strong weight towards a specific gender overall. We can take into weekend dates and groups of men going out to watch sports or other commonplace things in terms of the weekend whereas eating for utility is more common during the week.
+Note: your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio. 
